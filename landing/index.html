@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Press-capture landing page concept</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+<header class="concept-bar">
+  <p><strong>Concept for review. Prepared by Santiago.</strong> Not a live page: the form and buttons send nothing. Brand copy, product names and press slots are placeholders for the brand to fill.</p>
+  <a href="../">Back to the pilot model</a>
+</header>
+
+<div class="layout">
+  <div class="stage">
+    <section class="arrive" aria-labelledby="arrive-label">
+      <span id="arrive-label">Visitor arrives from</span>
+      <div class="arrive-buttons">
+        <button type="button" data-src="meta" aria-pressed="false">A Meta ad</button>
+        <button type="button" data-src="klaviyo" aria-pressed="false">A pilot email</button>
+        <button type="button" data-src="press" aria-pressed="false">A press article</button>
+        <button type="button" data-src="direct" aria-pressed="true">Direct</button>
+      </div>
+    </section>
+
+    <main class="page" id="main">
+      <section class="lp-hero">
+        <p class="lp-brand" aria-label="Brand name placeholder">Brand name</p>
+        <h1>As seen in the press, now one tap from your door.</h1>
+        <p class="lp-sub">Short brand story line goes here: who the products are for and what changed since the coverage.</p>
+        <div class="press" aria-label="Press mentions (placeholders)">
+          <div class="press-slot"><span>Publication 1</span><small>Headline of the article</small></div>
+          <div class="press-slot"><span>Publication 2</span><small>Headline of the article</small></div>
+          <div class="press-slot"><span>Publication 3</span><small>Headline of the article</small></div>
+          <div class="press-slot"><span>Publication 4</span><small>Headline of the article</small></div>
+        </div>
+      </section>
+
+      <section class="lp-capture" aria-labelledby="capture-title">
+        <h2 id="capture-title">Get the story behind the headlines</h2>
+        <p>The full feature, the routine people ask about most, and early access to new launches.</p>
+        <form id="capture" novalidate>
+          <label for="email">Email address</label>
+          <div class="capture-row">
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            <button type="submit">Send me the story</button>
+          </div>
+          <label class="consent"><input type="checkbox" id="consent" required> Yes, email me news and offers. Unsubscribe any time.</label>
+          <p class="form-msg" id="form-msg" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="lp-products" aria-labelledby="products-title">
+        <h2 id="products-title">Find them on Amazon</h2>
+        <div class="products" id="products"></div>
+      </section>
+      <footer class="lp-foot">Concept page. Product links go to Amazon through an Attribution tag chosen by the visitor&rsquo;s source.</footer>
+    </main>
+  </div>
+
+  <aside class="log" aria-labelledby="log-title">
+    <div class="log-head">
+      <h2 id="log-title">Event log</h2>
+      <button type="button" id="clear-log">Clear</button>
+    </div>
+    <p class="log-note">What this page would send. GA4 events go to the dataLayer; Klaviyo calls use the public client API (no private key on the page); Amazon links carry the Attribution tag. Klaviyo requests come from the same builder the spec check runs against.</p>
+    <dl class="log-state" id="log-state"></dl>
+    <ol class="entries" id="entries" aria-live="polite"></ol>
+  </aside>
+</div>
+<script type="module" src="landing.mjs"></script>
+</body>
+</html>

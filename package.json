@@ -1,0 +1,9 @@
+{
+  "name": "tmc-pilot-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static demo: reactivation pilot model and press-capture landing page concept. No build step.",
+  "scripts": {
+    "start": "node -e \"console.log('Static site: deploy this folder as-is, or serve it with any static server.')\""
+  }
+}

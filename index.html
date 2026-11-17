@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Reactivation pilot model for The Mane Choice</title>
+<meta name="description" content="A working model of a 6-week Klaviyo reactivation pilot: list triage, guarded send ramp, flows, Amazon Attribution and Meta test sizing.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/young-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/schibsted-grotesk-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <p class="brandline">Reactivation pilot model for The Mane Choice</p>
+    <p class="byline">Prepared by Santiago</p>
+    <nav aria-label="Sections">
+      <a href="#list">Who gets mailed</a>
+      <a href="#ramp">How fast to send</a>
+      <a href="#flows">What fires the flows</a>
+      <a href="#money">What the money can tell you</a>
+      <a href="landing/">Landing page concept</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <h1 id="hero-title">200,000 dormant contacts, sorted before the first send.</h1>
+    <p class="lede">A working model of the 6-week pilot: who to verify, who to mail first, how fast to ramp without tripping Gmail&rsquo;s spam limits, and what Amazon will and won&rsquo;t report back. It runs on a synthetic list with stated assumptions until the real export arrives; swap the file and every number below recalculates.</p>
+
+    <figure class="listbar-figure">
+      <div class="listbar-head">
+        <figcaption id="listbar-caption">The 200,000 contacts by last real engagement. Solid: verified and mailable in the pilot. Striped: verification failures or held back.</figcaption>
+        <label class="switch">
+          <input type="checkbox" id="mpp-toggle">
+          <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          <span>Count Apple privacy opens as engagement</span>
+        </label>
+      </div>
+      <div class="listbar" id="listbar" role="img" aria-describedby="listbar-caption"></div>
+      <div class="listbar-labels" id="listbar-labels"></div>
+      <p class="mpp-note" id="mpp-note" aria-live="polite"></p>
+    </figure>
+
+    <div class="findings">
+      <h2 class="visually-hidden">What the model found</h2>
+      <ol class="finding-list" id="findings"></ol>
+    </div>
+  </section>
+
+  <section class="band" id="list" aria-labelledby="list-title">
+    <div class="wrap">
+      <h2 id="list-title">Who gets mailed</h2>
+      <p class="section-lede">Verification first, then tiers by the last time someone clicked, bought or visited the site. Opens are left out on purpose: Apple Mail opens every message automatically, so an open says nothing about a person.</p>
+      <div class="grid-2">
+        <div>
+          <h3>Verification result by tier</h3>
+          <div class="table-scroll" tabindex="0"><table class="data" id="matrix"></table></div>
+          <p class="note" id="matrix-note"></p>
+          <details class="assumptions">
+            <summary>Assumptions behind the synthetic list</summary>
+            <div id="list-assumptions"></div>
+          </details>
+        </div>
+        <div>
+          <h3>Send policy</h3>
+          <dl class="policy" id="policy"></dl>
+          <h3>Verification cost against the budget</h3>
+          <div class="callout" id="budget"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="ramp" aria-labelledby="ramp-title">
+    <div class="wrap">
+      <h2 id="ramp-title">How fast to send</h2>
+      <p class="section-lede">Gmail judges the sending domain on its spam rate across all mail and wants it under 0.3%, ideally under 0.1%. The unknown that decides the pilot is how often cold contacts hit &ldquo;report spam&rdquo;. The ramp finds out on the first 5,000 to 15,000 of them instead of on all 50,000.</p>
+
+      <div class="preflight">
+        <h3>Pre-flight: authentication check</h3>
+        <p class="note">Runs live in your browser through Cloudflare&rsquo;s public DNS-over-HTTPS service. Nothing is stored.</p>
+        <form id="dns-form" class="dns-form">
+          <label>Domain <input id="dns-domain" name="domain" value="themanechoice.com" autocomplete="off" spellcheck="false" required></label>
+          <label>Klaviyo sending subdomain <input id="dns-sending" name="sending" placeholder="send.themanechoice.com" autocomplete="off" spellcheck="false"></label>
+          <button type="submit" class="btn">Check DNS</button>
+        </form>
+        <ul class="checks" id="dns-results" aria-live="polite"></ul>
+      </div>
+
+      <div class="sim">
+        <div class="sim-controls">
+          <h3>Simulated pilot, 24 Nov to 4 Jan</h3>
+          <label for="cold-rate">Cold-tier spam complaint rate at Gmail: <output id="cold-rate-out">0.25%</output></label>
+          <input type="range" id="cold-rate" min="0.05" max="0.8" step="0.05" value="0.25">
+          <div class="sim-buttons">
+            <button type="button" class="btn btn-quiet" id="rerun">Run another draw</button>
+            <button type="button" class="btn btn-quiet" id="reset-sim">Reset</button>
+          </div>
+          <dl class="sim-stats" id="sim-stats"></dl>
+          <p class="note">One send to each tier at most every 2 days, because Gmail&rsquo;s figure arrives late. Medium starts after warm reads green, cold after medium. Each batch is sized so the projected 7-day rate stays under 0.2%, and under 0.3% allowing for ordinary complaint noise. Cold is planned at 0.5% until its own numbers arrive.</p>
+        </div>
+        <div class="sim-charts">
+          <div class="legend" id="ramp-legend"></div>
+          <div class="chart" id="chart-sends"></div>
+          <div class="chart" id="chart-rate"></div>
+          <div class="tooltip" id="tooltip" role="status" hidden></div>
+          <details class="tableview">
+            <summary>Show every send as a table</summary>
+            <div class="table-scroll" tabindex="0"><table class="data" id="sends-table"></table></div>
+          </details>
+        </div>
+      </div>
+
+      <h3>Blast or ramp: 300 simulated pilots for each complaint rate</h3>
+      <div class="table-scroll" tabindex="0"><table class="data" id="sweep"></table></div>
+      <p class="note" id="sweep-note"></p>
+
+      <h3>Campaign calendar</h3>
+      <ol class="campaigns" id="campaigns"></ol>
+    </div>
+  </section>
+
+  <section class="band" id="flows" aria-labelledby="flows-title">
+    <div class="wrap">
+      <h2 id="flows-title">What fires the flows</h2>
+      <p class="section-lede">Klaviyo flows react to events it receives about a person. The brand&rsquo;s own store and the landing page can send those events. Amazon can&rsquo;t: it reports clicks, detail page views, add-to-carts and purchases per Attribution tag, never per shopper.</p>
+      <div class="sources" id="sources"></div>
+      <h3>The five flows</h3>
+      <div class="flow-grid" id="flow-cards"></div>
+      <h3 id="payloads-title">API requests, checked against Klaviyo&rsquo;s published spec</h3>
+      <p class="note" id="payload-summary"></p>
+      <div class="payloads" id="payloads"></div>
+      <details class="assumptions">
+        <summary>Errors planted in valid requests, and whether the check caught them</summary>
+        <div class="table-scroll" tabindex="0"><table class="data" id="planted"></table></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="money" aria-labelledby="money-title">
+    <div class="wrap">
+      <h2 id="money-title">What the money can tell you</h2>
+      <p class="section-lede">Meta can&rsquo;t see Amazon purchases, so the ads optimise for the landing page&rsquo;s email sign-up and Amazon sales are counted through Attribution tags. The real question for a $1,500 to $2,500 test is which decisions it has enough data to make.</p>
+      <div class="money">
+        <div class="money-controls">
+          <label for="m-spend">Meta spend: <output id="m-spend-out"></output></label>
+          <input type="range" id="m-spend" min="1500" max="2500" step="100" value="2000">
+          <label for="m-warm">Share on warm retargeting: <output id="m-warm-out"></output></label>
+          <input type="range" id="m-warm" min="0.2" max="0.6" step="0.05" value="0.4">
+          <label for="m-cpm">Cold CPM: <output id="m-cpm-out"></output></label>
+          <input type="range" id="m-cpm" min="8" max="20" step="1" value="12">
+          <label for="m-ctr">Cold link click-through: <output id="m-ctr-out"></output></label>
+          <input type="range" id="m-ctr" min="0.5" max="2" step="0.1" value="1">
+        </div>
+        <div>
+          <div class="table-scroll" tabindex="0"><table class="data" id="meta-table"></table></div>
+          <h3>What a 50/50 creative test in the cold audience can decide</h3>
+          <ul class="checks" id="verdict"></ul>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <h3>Email to Amazon, from the simulated pilot</h3>
+          <div class="table-scroll" tabindex="0"><table class="data" id="email-table"></table></div>
+          <p class="note">Purchases per click are assumptions until the first Attribution reports land; Amazon credits a purchase up to 14 days after the click.</p>
+        </div>
+        <div>
+          <h3>Attribution and UTM plan</h3>
+          <p class="note" id="tags-note"></p>
+        </div>
+      </div>
+      <div class="table-scroll tall tags-block" tabindex="0"><table class="data" id="tags"></table></div>
+    </div>
+  </section>
+
+  <section class="band" id="landing" aria-labelledby="landing-title">
+    <div class="wrap landing-teaser">
+      <div>
+        <h2 id="landing-title">The press-capture page</h2>
+        <p class="section-lede">A concept of the landing page: email capture and an Amazon button with no Shopify checkout. Its event log shows every GA4 event and Klaviyo call as you use it, and the Amazon link switches to the Attribution tag for wherever the visitor came from.</p>
+        <p><a class="btn" href="landing/">Open the landing page concept</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="measured" aria-labelledby="measured-title">
+    <div class="wrap grid-2">
+      <div>
+        <h2 id="measured-title">Measured</h2>
+        <ul class="plain" id="measured-list"></ul>
+      </div>
+      <div>
+        <h2>Not measured</h2>
+        <ul class="plain">
+          <li>The real list. Every count here comes from a synthetic 200,000-row list with the assumptions shown above.</li>
+          <li>Complaint, bounce and click rates per tier. They are inputs; the first batches replace them.</li>
+          <li>Live DNS for themanechoice.com from the build machine (its network blocks DNS). The check above runs in your browser instead.</li>
+          <li>Calls to Klaviyo, Amazon or Meta. Requests are checked against Klaviyo&rsquo;s spec, not sent. The spec doesn&rsquo;t forbid unknown extra fields, so a misspelt optional field would pass.</li>
+          <li>NeverBounce pricing: published figures disagree, so both ends are shown.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>Prepared by Santiago for The Mane Choice&rsquo;s review. Not affiliated with The Mane Choice, Klaviyo, Amazon or Meta. <span id="generated"></span></p>
+  </div>
+</footer>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>
